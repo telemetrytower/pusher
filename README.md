@@ -7,7 +7,7 @@ TelemetryTower tsdb implement Prometheus PushGateway protocol.
 ## How to run
 
 
-Before to run code, update the real basic auth account [main.go#L54](https://github.com/telemetrytower/pusher/blob/master/main.go#L54) please.
+Before to run code, update [main.go#L55](https://github.com/telemetrytower/pusher/blob/master/main.go#L54) token to a real one please.
 
 ```
 git clone https://github.com/telemetrytower/pusher.git

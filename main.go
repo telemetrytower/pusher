@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/push"
@@ -51,7 +52,7 @@ func main() {
 	// update username/password to real telmetry tower account
 	pusher := push.New("https://io.telemetrytower.com/pushgateway", "db_backup").
 		Grouping("instance", "cluster01").
-		BasicAuth("username", "password")
+		Client(NewBearerHttpDoer("token"))
 
 	// register metrics
 	pusher.Collector(completionTime)
@@ -63,4 +64,21 @@ func main() {
 	if err := pusher.Push(); err != nil {
 		fmt.Println("Could not push completion time to Pushgateway:", err)
 	}
+}
+
+type BearerHttpDoer struct {
+	jwtToken string
+	client   *http.Client
+}
+
+func NewBearerHttpDoer(token string) *BearerHttpDoer {
+	return &BearerHttpDoer{
+		jwtToken: token,
+		client:   &http.Client{},
+	}
+}
+
+func (d *BearerHttpDoer) Do(req *http.Request) (*http.Response, error) {
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", d.jwtToken))
+	return d.client.Do(req)
 }
